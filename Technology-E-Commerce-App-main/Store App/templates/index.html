@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Request System</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Maintenance Request System</h1>
+        <p>Submit your maintenance request below:</p>
+        
+        <form action="/submit_request" method="post">
+            <label for="apartment_number">Apartment Number:</label>
+            <input type="text" id="apartment_number" name="apartment_number" required>
+
+            <label for="problem_area">Problem Area:</label>
+            <input type="text" id="problem_area" name="problem_area" required>
+
+            <label for="problem_description">Problem Description:</label>
+            <textarea id="problem_description" name="problem_description" required></textarea>
+
+            <label for="photo">Optional Photo URL:</label>
+            <input type="text" id="photo" name="photo">
+
+            <input type="submit" value="Submit Request">
+        </form>
+
+        <!-- Inside the Recent Requests section -->
+            <h2>Recent Requests</h2>
+            <ul>
+                {% for request in requests %}
+                    <li>
+                        <strong>Request ID:</strong> {{ request.request_id }}<br>
+                        <strong>Apartment Number:</strong> {{ request.apartment_number }}<br>
+                        <strong>Problem Area:</strong> {{ request.problem_area }}<br>
+                        <strong>Problem Description:</strong> {{ request.problem_description }}<br>
+                        <strong>Date/Time:</strong> {{ request.date_time }}<br>
+                        
+                        {% if request.photo %}
+                            <!-- Display the image using <img> tag -->
+                            <strong>Photo:</strong> <img src="{{ request.photo }}" alt="Request Photo"><br>
+                        {% endif %}
+                        
+                        <strong>Status:</strong> {{ request.status }}<br>
+                        <hr>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        <!-- Maintenance Team Section -->
+        <h2>Maintenance Team - Browse Requests</h2>
+        <form action="/browse_requests" method="post">
+            <label for="filter_apartment">Filter by Apartment Number:</label>
+            <input type="text" id="filter_apartment" name="filter_apartment">
+
+            <label for="filter_area">Filter by Area:</label>
+            <input type="text" id="filter_area" name="filter_area">
+
+            <label for="filter_date">Filter by Date:</label>
+            <input type="date" id="filter_date" name="filter_date">
+
+            <label for="filter_status">Filter by Status:</label>
+            <select id="filter_status" name="filter_status">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+
+            <input type="submit" value="Apply Filters">
+        </form>
+
+        <h2>Filtered Requests</h2>
+        <ul>
+            {% for request in maintenance_requests %}
+                <li>
+                    <strong>Request ID:</strong> {{ request.request_id }}<br>
+                    <strong>Apartment Number:</strong> {{ request.apartment_number }}<br>
+                    <!-- Add other details as needed -->
+
+                    {% if request.status == 'pending' %}
+                        <form action="/update_status" method="post" style="display: inline;">
+                            <input type="hidden" name="request_id" value="{{ request.request_id }}">
+                            <input type="hidden" name="new_status" value="completed">
+                            <button type="submit">Mark as Completed</button>
+                        </form>
+                    {% endif %}
+
+                    <hr>
+                </li>
+            {% endfor %}
+        </ul>
+        <!-- Manager Section -->
+        <h2>Manager Section</h2>
+        <!-- Add Tenant Form -->
+        <form action="/add_tenant" method="post">
+            <h3>Add Tenant</h3>
+            <label for="tenant_name">Tenant Name:</label>
+            <input type="text" id="tenant_name" name="tenant_name" required>
+
+            <label for="tenant_phone">Phone Number:</label>
+            <input type="text" id="tenant_phone" name="tenant_phone" required>
+
+            <label for="tenant_email">Email:</label>
+            <input type="email" id="tenant_email" name="tenant_email" required>
+
+            <label for="check_in_date">Check-In Date:</label>
+            <input type="date" id="check_in_date" name="check_in_date" required>
+
+            <label for="apartment_number">Apartment Number:</label>
+            <input type="text" id="apartment_number" name="apartment_number" required>
+
+            <input type="submit" value="Add Tenant">
+        </form>
+
+        <!-- Move Tenant Form -->
+        <form action="/move_tenant" method="post">
+            <h3>Move Tenant</h3>
+            <label for="tenant_id_move">Tenant ID:</label>
+            <input type="text" id="tenant_id_move" name="tenant_id_move" required>
+
+            <label for="new_apartment_number">New Apartment Number:</label>
+            <input type="text" id="new_apartment_number" name="new_apartment_number" required>
+
+            <input type="submit" value="Move Tenant">
+        </form>
+
+        <!-- Delete Tenant Form -->
+        <form action="/delete_tenant" method="post">
+            <h3>Delete Tenant</h3>
+            <label for="tenant_id_delete">Tenant ID:</label>
+            <input type="text" id="tenant_id_delete" name="tenant_id_delete" required>
+
+            <input type="submit" value="Delete Tenant">
+        </form>
+
+        <h2>Current Tenants</h2>
+        <ul>
+            {% for tenant in tenants %}
+                <li>
+                    <strong>Tenant ID:</strong> {{ tenant.tenant_id }}<br>
+                    <strong>Name:</strong> {{ tenant.name }}<br>
+                    <strong>Phone:</strong> {{ tenant.phone }}<br>
+                    <strong>Email:</strong> {{ tenant.email }}<br>
+                    <strong>Check-In Date:</strong> {{ tenant.check_in_date }}<br>
+                    <strong>Apartment Number:</strong> {{ tenant.apartment_number }}<br>
+                    <hr>
+                </li>
+            {% endfor %}
+</ul>
+    </div>
+</body>
+</html>
